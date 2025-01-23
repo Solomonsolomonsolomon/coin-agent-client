@@ -2,67 +2,67 @@
 import React, { useState } from "react";
 import api from "./lib/api";
 import { useWallet } from "@suiet/wallet-kit";
+import Utils from "./utils/utils";
+
 export default function Home() {
   const [messages, setMessages] = useState<
     { text: string; sender: "user" | "llm" }[]
   >([]);
   const [inputValue, setInputValue] = useState("");
   const [isThinking, setIsThinking] = useState(false);
- const {address}=useWallet()
+  const { address } = useWallet();
   const sampleQuestions = [
     "What is The price of SUI?",
-    "How is the price of bitcoin?",
+    "What is the price of bitcoin?",
     "Top 10 pools by TVL?",
-    "How can I stake tokens?",
+    "Compare the prices between btc and sui?",
   ];
+  const handleSend = async (message?: string) => {
+    const userMessage = message || inputValue.trim();
 
- const handleSend = async (message?: string) => {
-   const userMessage = message || inputValue.trim();
+    if (userMessage) {
+      setMessages((prev) => [...prev, { text: userMessage, sender: "user" }]);
+      setIsThinking(true);
+      setInputValue("");
 
-   
-   if (userMessage) {
-     setMessages((prev) => [...prev, { text: userMessage, sender: "user" }]);
-     setIsThinking(true);
-     setInputValue("");
+      try {
+        let modifiedMessage = userMessage;
 
-     try {
+        const keywords = ["transaction", "transfer", "send", "funds", "wallet"];
+        const containsKeywords = keywords.some((keyword) =>
+          userMessage.toLowerCase().includes(keyword)
+        );
 
-       let modifiedMessage = userMessage;
-    
-       const keywords = ["transaction", "transfer", "send", "funds", "wallet"];
-       const containsKeywords = keywords.some((keyword) =>
-         userMessage.toLowerCase().includes(keyword)
-       );
+        if (containsKeywords) {
+          modifiedMessage = `${userMessage}. My wallet address is ${address}.`;
+        }
 
-       if (containsKeywords) {
-         modifiedMessage = `${userMessage}. My wallet address is ${address}.`;
-       }
+        console.log(modifiedMessage, "modified");
+        const response = await api.post("/query", { prompt: modifiedMessage });
+        const res = response.data[0];
+        console.log(res);
+        let llmResponse = "";
 
-      console.log(modifiedMessage,'modfiied')
-       const response = await api.post("/query", { prompt: modifiedMessage });
-       let res = response.data[0];
-       let llmResponse = "";
+        typeof res.response === "string"
+          ? (llmResponse = res.response)
+          : (llmResponse = Utils.format(res.response));
+        
 
-       if (res.status === "success" && typeof res.response === "string") {
-         llmResponse = res.response;
-       }
-
-       setMessages((prev) => [...prev, { text: llmResponse, sender: "llm" }]);
-     } catch (error) {
-       console.error("Error querying the LLM:", error);
-       setMessages((prev) => [
-         ...prev,
-         {
-           text: "Sorry, there was an error. Please try again.",
-           sender: "llm",
-         },
-       ]);
-     } finally {
-       setIsThinking(false);
-     }
-   }
- };
-
+        setMessages((prev) => [...prev, { text: llmResponse, sender: "llm" }]);
+      } catch (error) {
+        console.error("Error querying the LLM:", error);
+        setMessages((prev) => [
+          ...prev,
+          {
+            text: "Sorry, there was an error. Please try again.",
+            sender: "llm",
+          },
+        ]);
+      } finally {
+        setIsThinking(false);
+      }
+    }
+  };
 
   return (
     <div className="h-[90dvh] w-[90dvw] border flex justify-center relative items-center flex-col bg-gray-100">
@@ -80,7 +80,7 @@ export default function Home() {
         {messages.map((message, index) => (
           <div
             key={index}
-            className={`relative mb-3 p-3 rounded-md max-w-[40%] opacity-100 ${
+            className={`relative mb-3 p-3 rounded-md max-w-[40%] break-words opacity-100 ${
               message.sender === "user"
                 ? "bg-blue-500 text-white self-end ml-auto text-right"
                 : "bg-gray-300 text-black self-start mr-auto text-left"
