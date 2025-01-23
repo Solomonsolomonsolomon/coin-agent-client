@@ -1,14 +1,14 @@
 "use client";
 import React, { useState } from "react";
 import api from "./lib/api";
-
+import { useWallet } from "@suiet/wallet-kit";
 export default function Home() {
   const [messages, setMessages] = useState<
     { text: string; sender: "user" | "llm" }[]
   >([]);
   const [inputValue, setInputValue] = useState("");
   const [isThinking, setIsThinking] = useState(false);
-
+ const {address}=useWallet()
   const sampleQuestions = [
     "What is The price of SUI?",
     "How is the price of bitcoin?",
@@ -16,40 +16,53 @@ export default function Home() {
     "How can I stake tokens?",
   ];
 
-  const handleSend = async (message?: string) => {
-    const userMessage = message || inputValue.trim();
+ const handleSend = async (message?: string) => {
+   const userMessage = message || inputValue.trim();
 
-    if (userMessage) {
-      setMessages((prev) => [...prev, { text: userMessage, sender: "user" }]);
-      setIsThinking(true);
-      setInputValue("");
+   
+   if (userMessage) {
+     setMessages((prev) => [...prev, { text: userMessage, sender: "user" }]);
+     setIsThinking(true);
+     setInputValue("");
 
-      try {
-        // Send the user message to your API
-        const response = await api.post("/query", { prompt: userMessage }); 
-        let res=response.data[0]
-        let llmResponse='';
-         if (res.status=='success' && typeof(res.response)=='string') {
-          llmResponse=res.response;
-         }
-        //
-       
+     try {
 
-        setMessages((prev) => [...prev, { text: llmResponse, sender: "llm" }]);
-      } catch (error) {
-        console.error("Error querying the LLM:", error);
-        setMessages((prev) => [
-          ...prev,
-          {
-            text: "Sorry, there was an error. Please try again.",
-            sender: "llm",
-          },
-        ]);
-      } finally {
-        setIsThinking(false);
-      }
-    }
-  };
+       let modifiedMessage = userMessage;
+    
+       const keywords = ["transaction", "transfer", "send", "funds", "wallet"];
+       const containsKeywords = keywords.some((keyword) =>
+         userMessage.toLowerCase().includes(keyword)
+       );
+
+       if (containsKeywords) {
+         modifiedMessage = `${userMessage}. My wallet address is ${address}.`;
+       }
+
+      console.log(modifiedMessage,'modfiied')
+       const response = await api.post("/query", { prompt: modifiedMessage });
+       let res = response.data[0];
+       let llmResponse = "";
+
+       if (res.status === "success" && typeof res.response === "string") {
+         llmResponse = res.response;
+       }
+
+       setMessages((prev) => [...prev, { text: llmResponse, sender: "llm" }]);
+     } catch (error) {
+       console.error("Error querying the LLM:", error);
+       setMessages((prev) => [
+         ...prev,
+         {
+           text: "Sorry, there was an error. Please try again.",
+           sender: "llm",
+         },
+       ]);
+     } finally {
+       setIsThinking(false);
+     }
+   }
+ };
+
 
   return (
     <div className="h-[90dvh] w-[90dvw] border flex justify-center relative items-center flex-col bg-gray-100">
