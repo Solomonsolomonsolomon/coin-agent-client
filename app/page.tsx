@@ -6,7 +6,7 @@ import Utils from "./utils/utils";
 
 export default function Home() {
   const [messages, setMessages] = useState<
-    { text: string; sender: "user" | "llm" }[]
+    { text: string; sender: "user" | "llm"; isHTML?: boolean }[]
   >([]);
   const [inputValue, setInputValue] = useState("");
   const [isThinking, setIsThinking] = useState(false);
@@ -17,52 +17,58 @@ export default function Home() {
     "Top 10 pools by TVL?",
     "Compare the prices between btc and sui?",
   ];
-  const handleSend = async (message?: string) => {
-    const userMessage = message || inputValue.trim();
+ const handleSend = async (message?: string) => {
+   const userMessage = message || inputValue.trim();
 
-    if (userMessage) {
-      setMessages((prev) => [...prev, { text: userMessage, sender: "user" }]);
-      setIsThinking(true);
-      setInputValue("");
+   if (userMessage) {
+     setMessages((prev) => [...prev, { text: userMessage, sender: "user" }]);
+     setIsThinking(true);
+     setInputValue("");
 
-      try {
-        let modifiedMessage = userMessage;
+     try {
+       let modifiedMessage = userMessage;
 
-        const keywords = ["transaction", "transfer", "send", "funds", "wallet"];
-        const containsKeywords = keywords.some((keyword) =>
-          userMessage.toLowerCase().includes(keyword)
-        );
+       const keywords = ["transaction", "transfer", "send", "funds", "wallet"];
+       const containsKeywords = keywords.some((keyword) =>
+         userMessage.toLowerCase().includes(keyword)
+       );
 
-        if (containsKeywords) {
-          modifiedMessage = `${userMessage}. My wallet address is ${address}.`;
-        }
+       if (containsKeywords) {
+         modifiedMessage = `${userMessage}. My wallet address is ${address}.`;
+       }
 
-        console.log(modifiedMessage, "modified");
-        const response = await api.post("/query", { prompt: modifiedMessage });
-        const res = response.data[0];
-        console.log(res);
-        let llmResponse = "";
+       console.log(modifiedMessage, "modified");
+       const response = await api.post("/query", { prompt: modifiedMessage });
+       const res = response.data[0];
+       console.log(res);
+       let llmResponse = "";
 
-        typeof res.response === "string"
-          ? (llmResponse = res.response)
-          : (llmResponse = Utils.format(res.response));
-        
+       if (typeof res.response === "string") {
+         llmResponse = res.response;
+       } else {
+         llmResponse = Utils.format(res.response); // Use the JSONFormatter class
+       }
 
-        setMessages((prev) => [...prev, { text: llmResponse, sender: "llm" }]);
-      } catch (error) {
-        console.error("Error querying the LLM:", error);
-        setMessages((prev) => [
-          ...prev,
-          {
-            text: "Sorry, there was an error. Please try again.",
-            sender: "llm",
-          },
-        ]);
-      } finally {
-        setIsThinking(false);
-      }
-    }
-  };
+       // Add the LLM response as HTML
+       setMessages((prev) => [
+         ...prev,
+         { text: llmResponse, sender: "llm", isHTML: true }, // Add a flag to indicate HTML content
+       ]);
+     } catch (error) {
+       console.error("Error querying the LLM:", error);
+       setMessages((prev) => [
+         ...prev,
+         {
+           text: "Sorry, there was an error. Please try again.",
+           sender: "llm",
+           isHTML: false, // This is plain text
+         },
+       ]);
+     } finally {
+       setIsThinking(false);
+     }
+   }
+ };
 
   return (
     <div className="h-[90dvh] w-[90dvw] border flex justify-center relative items-center flex-col bg-gray-100">
@@ -86,7 +92,11 @@ export default function Home() {
                 : "bg-gray-300 text-black self-start mr-auto text-left"
             }`}
           >
-            {message.text}
+            {message.isHTML ? (
+              <div dangerouslySetInnerHTML={{ __html: message.text }} />
+            ) : (
+              <div>{message.text}</div>
+            )}
           </div>
         ))}
 

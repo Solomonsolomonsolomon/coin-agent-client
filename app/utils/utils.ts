@@ -1,89 +1,89 @@
-class JsonFormatter {
-  private static readonly INDENT = "  ";
-
-  // Formats the JSON-like data into a human-readable format without JSON braces/commas.
-  public static format(data: unknown, depth = 0): string {
-    if (data === null) return `${this.INDENT.repeat(depth)}null`;
-    if (data === undefined) return `${this.INDENT.repeat(depth)}undefined`;
-
-    const indent = this.INDENT.repeat(depth);
-
-    // Primitive type handling
-    switch (typeof data) {
-      case "string":
-        return `${indent}"${data}"`;
-      case "number":
-        return `${indent}${data}`;
-      case "boolean":
-        return `${indent}${data}`;
-    }
-
-    // Array handling
-    if (Array.isArray(data)) {
-      if (data.length === 0) return `${indent}[]`;
-
-      const items = data
-        .map((item) => `${this.format(item, depth + 1)}`)
-        .join("\n");
-      return `\n${items}`;
-    }
-
-    // Object handling
-    if (typeof data === "object") {
-      const entries = Object.entries(data)
-        .map(
-          ([key, value]) =>
-            `${this.INDENT.repeat(depth + 1)}${key}: ${this.format(
-              value,
-              depth + 1
-            )}`
-        )
-        .join("\n");
-      return `\n${entries}`;
-    }
-
-    // Fallback for unknown types
-    return String(data);
+class JSONFormatter {
+  /**
+   * Formats a JSON object into well-structured, human-readable HTML with styled sections.
+   * @param json - The JSON object to format.
+   * @returns A string containing the formatted HTML.
+   */
+  public static format(json: any): string {
+    return this.formatJSON(json, 0);
   }
 
   /**
-   * Processes the response and returns a formatted string representation.
-   * @param res - Response object
-   * @returns Formatted string
+   * Recursively formats a JSON object into HTML.
+   * @param data - The JSON data to format.
+   * @param indentLevel - The current indentation level.
+   * @returns A string containing the formatted HTML.
    */
-  public static processResponse(res: { response: unknown }): string {
-    return typeof res.response === "string"
-      ? res.response
-      : this.format(res.response);
+  private static formatJSON(data: any, indentLevel: number): string {
+    if (Array.isArray(data)) {
+      return this.formatArray(data, indentLevel);
+    } else if (typeof data === "object" && data !== null) {
+      return this.formatObject(data, indentLevel);
+    } else {
+      return this.formatPrimitive(data, indentLevel);
+    }
+  }
+
+  /**
+   * Formats an array into HTML with styled sections for arrays of objects.
+   * @param array - The array to format.
+   * @param indentLevel - The current indentation level.
+   * @returns A string containing the formatted HTML.
+   */
+  private static formatArray(array: any[], indentLevel: number): string {
+    let html = "";
+    array.forEach((item, index) => {
+      if (typeof item === "object" && item !== null) {
+        // Add a styled section for arrays of objects
+        html += `<div style="margin: 10px 0; padding: 10px; border: 1px solid #ddd; border-radius: 5px; background: #f9f9f9;">
+          ${this.formatJSON(item, indentLevel + 1)}
+        </div>`;
+      } else {
+        // Regular array items (non-objects)
+        html += `<div style="margin-left: ${
+          indentLevel * 20
+        }px;">- ${this.formatJSON(item, indentLevel + 1)}</div>`;
+      }
+    });
+    return html;
+  }
+
+  /**
+   * Formats an object into HTML.
+   * @param obj - The object to format.
+   * @param indentLevel - The current indentation level.
+   * @returns A string containing the formatted HTML.
+   */
+  private static formatObject(
+    obj: { [key: string]: any },
+    indentLevel: number
+  ): string {
+    let html = "";
+    const keys = Object.keys(obj);
+    keys.forEach((key, index) => {
+      html += `<div style="margin-left: ${indentLevel * 20}px;">
+        <strong>${key}:</strong> ${this.formatJSON(obj[key], indentLevel + 1)}
+      </div>`;
+    });
+    return html;
+  }
+
+  /**
+   * Formats a primitive value into HTML.
+   * @param value - The primitive value to format.
+   * @param indentLevel - The current indentation level.
+   * @returns A string containing the formatted HTML.
+   */
+  private static formatPrimitive(value: any, indentLevel: number): string {
+    if (typeof value === "string") {
+      return `<span>"${value}"</span>`; // Wrap strings in quotes for clarity
+    } else if (value === null) {
+      return "<span>null</span>"; // Handle null values
+    } else if (typeof value === "undefined") {
+      return "<span>undefined</span>"; // Handle undefined values
+    } else {
+      return `<span>${value.toString()}</span>`; // Numbers, booleans, etc.
+    }
   }
 }
-
-export default JsonFormatter;
-
-// Usage example
-interface ApiResponse {
-  response: string | Record<string, unknown> | unknown[];
-}
-
-function handleResponse(res: ApiResponse): string {
-  return JsonFormatter.processResponse(res);
-}
-
-// Test case
-const testResponse: ApiResponse = {
-  response: {
-    status: "success",
-    data: {
-      user: {
-        id: 1,
-        name: "John Doe",
-        isActive: true,
-        roles: ["admin", "editor"],
-      },
-      metadata: null,
-      count: 42,
-    },
-  },
-};
-
-console.log(handleResponse(testResponse));
+export default JSONFormatter;
