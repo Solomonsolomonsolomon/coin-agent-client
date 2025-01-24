@@ -21,7 +21,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`h-[100%] ${manrope.className}`}>
+      <body className={`h-[100%] ${manrope.className} bg-gray-100`}>
         <Providers>
           <Sidebar>
             <div className="m-4">

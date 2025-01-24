@@ -71,7 +71,7 @@ export default function Home() {
  };
 
   return (
-    <div className="h-[90dvh] w-[90dvw] border flex justify-center relative items-center flex-col bg-gray-100">
+    <div className="h-[90dvh] w-[90dvw]  flex justify-center relative items-center flex-col bg-gray-100">
       {/* Chat messages */}
       <div className="flex-grow overflow-y-auto p-4 w-[82dvw] rounded mt-3 bg-gray-100 relative">
         <div
