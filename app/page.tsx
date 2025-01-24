@@ -2,8 +2,8 @@
 import React, { useState } from "react";
 import api from "./lib/api";
 import { useWallet } from "@suiet/wallet-kit";
-import Utils from "./utils/utils";
-
+import JSONFormatter from "./utils/JSONFormatter";
+import SampleQuestionsCarousel from "./components/sections/SampleQuestionsCarousel";
 export default function Home() {
   const [messages, setMessages] = useState<
     { text: string; sender: "user" | "llm"; isHTML?: boolean }[]
@@ -46,13 +46,13 @@ export default function Home() {
        if (typeof res.response === "string") {
          llmResponse = res.response;
        } else {
-         llmResponse = Utils.format(res.response); // Use the JSONFormatter class
+         llmResponse = JSONFormatter.format(res.response); 
        }
 
-       // Add the LLM response as HTML
+      
        setMessages((prev) => [
          ...prev,
-         { text: llmResponse, sender: "llm", isHTML: true }, // Add a flag to indicate HTML content
+         { text: llmResponse, sender: "llm", isHTML: true },
        ]);
      } catch (error) {
        console.error("Error querying the LLM:", error);
@@ -107,7 +107,9 @@ export default function Home() {
           </div>
         )}
       </div>
+      {/* Input area */}
 
+   
       {/* Input area */}
       <div className="w-[90%] max-w-2xl">
         <div className="flex items-center mt-2">
@@ -141,18 +143,30 @@ export default function Home() {
         </div>
 
         {/* Sample Questions */}
-        <div className="mt-4 flex flex-wrap justify-center gap-2">
-          {sampleQuestions.map((question, index) => (
-            <button
-              key={index}
-              onClick={() => handleSend(question)}
-              className="bg-gray-200 text-black px-4 py-2 rounded-md hover:bg-gray-300"
-            >
-              {question}
-            </button>
-          ))}
+        <div className="mt-4">
+          {/* Desktop layout */}
+          <div className="hidden sm:flex flex-wrap justify-center gap-2">
+            {sampleQuestions.map((question, index) => (
+              <button
+                key={index}
+                onClick={() => handleSend(question)}
+                className="bg-gray-200 text-black px-4 py-2 rounded-md hover:bg-gray-300"
+              >
+                {question}
+              </button>
+            ))}
+          </div>
+
+          {/* Mobile carousel */}
+          <div className="sm:hidden flex justify-center">
+            <SampleQuestionsCarousel
+              questions={sampleQuestions}
+              onQuestionClick={handleSend}
+            />
+          </div>
         </div>
       </div>
+   
     </div>
   );
 }

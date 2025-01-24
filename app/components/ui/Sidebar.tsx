@@ -25,14 +25,8 @@ const Sidebar: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
   return (
     <div className="flex h-screen">
-      {/* Sidebar for Desktop */}
-      <div
-        className={`hidden sm:flex flex-col bg-gray-900 text-white transition-all duration-300 ${
-          isMobileMenuOpen ? "w-64" : "w-16"
-        }`}
-        onMouseEnter={() => setIsMobileMenuOpen(true)}
-        onMouseLeave={() => setIsMobileMenuOpen(false)}
-      >
+      {/* Desktop Sidebar */}
+      <div className="hidden sm:flex flex-col bg-gray-900 text-white w-16 hover:w-64 group transition-all duration-300">
         {/* Logo */}
         <div className="p-4 flex justify-center">
           <FiMenu size={24} />
@@ -42,25 +36,31 @@ const Sidebar: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         <div className="flex-1 space-y-4 mt-4">
           <div className="flex items-center p-4 hover:bg-gray-700 cursor-pointer">
             <AiOutlineHome size={24} />
-            {isMobileMenuOpen && <span className="ml-4">Home</span>}
+            <span className="ml-4 opacity-0 group-hover:opacity-100 transition-opacity">
+              Home
+            </span>
           </div>
           <div className="flex items-center p-4 hover:bg-gray-700 cursor-pointer">
             <AiOutlineUser size={24} />
-            {isMobileMenuOpen && <span className="ml-4">Profile</span>}
+            <span className="ml-4 opacity-0 group-hover:opacity-100 transition-opacity">
+              Profile
+            </span>
           </div>
           <div className="flex items-center p-4 hover:bg-gray-700 cursor-pointer">
             <AiOutlineSetting size={24} />
-            {isMobileMenuOpen && <span className="ml-4">Settings</span>}
+            <span className="ml-4 opacity-0 group-hover:opacity-100 transition-opacity">
+              Settings
+            </span>
           </div>
         </div>
       </div>
 
       {/* Mobile Hamburger Menu */}
-      <div className="sm:hidden bg-gray-900 text-white">
+      <div className="sm:hidden">
         <button
           id="menu-button"
-          className="p-4"
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          className="fixed top-2 left-4 z-50 p-2 bg-gray-900 text-white rounded"
+          onClick={() => setIsMobileMenuOpen(true)}
         >
           <FiMenu size={24} />
         </button>
@@ -68,7 +68,7 @@ const Sidebar: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         {isMobileMenuOpen && (
           <div
             id="mobile-menu"
-            className="fixed inset-0 bg-gray-800 text-white flex flex-col w-64 h-screen z-50 p-4"
+            className="fixed inset-0 bg-gray-800/90 text-white flex flex-col z-40 p-4"
           >
             <button
               className="self-end p-2"
@@ -90,11 +90,7 @@ const Sidebar: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       </div>
 
       {/* Main Content */}
-      <div
-        className={`flex-1 transition-all ${isMobileMenuOpen ? "ml-64" : ""}`}
-      >
-        {children}
-      </div>
+      <main className="flex-1">{children}</main>
     </div>
   );
 };
