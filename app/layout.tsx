@@ -1,12 +1,12 @@
 import "./globals.css";
-import { Inter } from "next/font/google";
+import { Manrope} from "next/font/google";
 import Header from "./components/ui/Header";
 import Providers from "@/app/providers";
 import "@suiet/wallet-kit/style.css";
 import "./walletCustomCss.css";
 import Sidebar from "./components/ui/Sidebar";
 
-const inter = Inter({ subsets: ["latin"] });
+const manrope = Manrope({ subsets: ["latin"] });
 
 export const metadata = {
   title: "CoinSage",
@@ -21,7 +21,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`h-[100%] ${inter.className}`}>
+      <body className={`h-[100%] ${manrope.className}`}>
         <Providers>
           <Sidebar>
             <div className="m-4">

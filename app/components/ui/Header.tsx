@@ -10,8 +10,8 @@ const Header = () => {
       <p style={{
         fontFamily:"cursive"
       }} className="text-lg text-right md:text-left">Atoma's Coin Sage</p>
-      <div className="w-10 border md:block  hidden ">
-        <ConnectButton className="bg-green-100 text-pink-400" label="Connect Wallet"  />
+      <div className="w-10 md:block  hidden ">
+        <ConnectButton className="" label="Connect Wallet"  />
       </div>
     </div>
   );

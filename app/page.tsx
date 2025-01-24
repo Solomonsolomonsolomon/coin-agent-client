@@ -61,7 +61,7 @@ export default function Home() {
          {
            text: "Sorry, there was an error. Please try again.",
            sender: "llm",
-           isHTML: false, // This is plain text
+           isHTML: false, 
          },
        ]);
      } finally {
@@ -86,7 +86,7 @@ export default function Home() {
         {messages.map((message, index) => (
           <div
             key={index}
-            className={`relative mb-3 p-3 rounded-md max-w-[40%] break-words opacity-100 ${
+            className={`relative mb-3 p-3 rounded-md  w-fit  md:max-w-[40%] break-words opacity-100 ${
               message.sender === "user"
                 ? "bg-blue-500 text-white self-end ml-auto text-right"
                 : "bg-gray-300 text-black self-start mr-auto text-left"

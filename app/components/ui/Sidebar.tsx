@@ -59,7 +59,7 @@ const Sidebar: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       <div className="sm:hidden">
         <button
           id="menu-button"
-          className="fixed top-2 left-4 z-50 p-2 bg-gray-900 text-white rounded"
+          className="fixed top-1 left-4 z-50 p-2 bg-gray-900 text-white rounded"
           onClick={() => setIsMobileMenuOpen(true)}
         >
           <FiMenu size={24} />
