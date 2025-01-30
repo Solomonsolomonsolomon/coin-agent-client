@@ -26,7 +26,7 @@ const Sidebar: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
     <div className="flex h-screen">
       {/* Desktop Sidebar */}
-      <div className="hidden sm:flex flex-col bg-gray-900 text-white w-16 hover:w-64 group transition-all duration-300">
+      <div className="hidden sm:flex flex-col bg-purple-950 text-white w-16 hover:w-64 group transition-all duration-300">
         {/* Logo */}
         <div className="p-4 flex justify-center">
           <FiMenu size={24} />
@@ -59,7 +59,7 @@ const Sidebar: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       <div className="sm:hidden">
         <button
           id="menu-button"
-          className="fixed top-1 left-4 z-50 p-2 bg-gray-900 text-white rounded"
+          className="fixed top-4 right-4 z-50 p-2 bg-gray-900 text-white rounded"
           onClick={() => setIsMobileMenuOpen(true)}
         >
           <FiMenu size={24} />

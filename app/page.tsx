@@ -3,7 +3,12 @@ import React, { useState } from "react";
 import api from "./lib/api";
 import { useWallet } from "@suiet/wallet-kit";
 import JSONFormatter from "./utils/JSONFormatter";
-import SampleQuestionsCarousel from "./components/sections/SampleQuestionsCarousel";
+
+import {keywords } from "./data";
+
+import Messages from "./components/sections/Messages";
+import SampleQuestions from "./components/sections/SampleQuestions";
+
 export default function Home() {
   const [messages, setMessages] = useState<
     { text: string; sender: "user" | "llm"; isHTML?: boolean }[]
@@ -11,12 +16,7 @@ export default function Home() {
   const [inputValue, setInputValue] = useState("");
   const [isThinking, setIsThinking] = useState(false);
   const { address } = useWallet();
-  const sampleQuestions = [
-    "What is The price of SUI?",
-    "What is the price of bitcoin?",
-    "Top 10 pools by TVL?",
-    "Compare the prices between btc and sui?",
-  ];
+ 
  const handleSend = async (message?: string) => {
    const userMessage = message || inputValue.trim();
 
@@ -28,7 +28,7 @@ export default function Home() {
      try {
        let modifiedMessage = userMessage;
 
-       const keywords = ["transaction", "transfer", "send", "funds", "wallet"];
+       
        const containsKeywords = keywords.some((keyword) =>
          userMessage.toLowerCase().includes(keyword)
        );
@@ -38,7 +38,7 @@ export default function Home() {
        }
 
        console.log(modifiedMessage, "modified");
-       const response = await api.post("/query", { prompt: modifiedMessage });
+       const response = await api.post("/query", { query: modifiedMessage });
        const res = response.data[0];
        console.log(res);
        let llmResponse = "";
@@ -75,7 +75,7 @@ export default function Home() {
       {/* Chat messages */}
       <div className="flex-grow overflow-y-auto p-4 w-[82dvw] rounded mt-3 bg-gray-100 relative">
         <div
-          className="absolute inset-0 bg-cover bg-center opacity-10"
+          className="sticky inset-0 bg-cover bg-center opacity-10"
           style={{
             backgroundImage: "url('/atomaLogo.svg')",
             backgroundRepeat: "no-repeat",
@@ -83,26 +83,11 @@ export default function Home() {
           }}
         ></div>
 
-        {messages.map((message, index) => (
-          <div
-            key={index}
-            className={`relative mb-3 p-3 rounded-md  w-fit  md:max-w-[40%] break-words opacity-100 ${
-              message.sender === "user"
-                ? "bg-blue-500 text-white self-end ml-auto text-right"
-                : "bg-gray-300 text-black self-start mr-auto text-left"
-            }`}
-          >
-            {message.isHTML ? (
-              <div dangerouslySetInnerHTML={{ __html: message.text }} />
-            ) : (
-              <div>{message.text}</div>
-            )}
-          </div>
-        ))}
+   <Messages messages={messages}/>
 
         {/* Loading indicator for LLM thinking */}
         {isThinking && (
-          <div className="relative mb-3 p-3 rounded-md max-w-[70%] bg-gray-300 text-black self-start mr-auto text-left">
+          <div className="relative mb-3 p-3 rounded-md w-fit max-w-[70%] bg-gray-300 text-black self-start mr-auto text-left">
             Please wait...
           </div>
         )}
@@ -143,28 +128,7 @@ export default function Home() {
         </div>
 
         {/* Sample Questions */}
-        <div className="mt-4">
-          {/* Desktop layout */}
-          <div className="hidden sm:flex flex-wrap justify-center gap-2">
-            {sampleQuestions.map((question, index) => (
-              <button
-                key={index}
-                onClick={() => handleSend(question)}
-                className="bg-gray-200 text-black px-4 py-2 rounded-md hover:bg-gray-300"
-              >
-                {question}
-              </button>
-            ))}
-          </div>
-
-          {/* Mobile carousel */}
-          <div className="sm:hidden flex justify-center">
-            <SampleQuestionsCarousel
-              questions={sampleQuestions}
-              onQuestionClick={handleSend}
-            />
-          </div>
-        </div>
+       <SampleQuestions handleSend={handleSend}/>
       </div>
    
     </div>
