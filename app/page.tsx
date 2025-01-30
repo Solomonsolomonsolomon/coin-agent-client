@@ -74,27 +74,28 @@ export default function Home() {
     <div className="h-[90dvh] w-[90dvw]  flex justify-center relative items-center flex-col bg-gray-100">
       {/* Chat messages */}
       <div className="flex-grow overflow-y-auto p-4 w-[82dvw] rounded mt-3 bg-gray-100 relative">
-        <div
-          className="sticky inset-0 bg-cover bg-center opacity-10"
-          style={{
-            backgroundImage: "url('/atomaLogo.svg')",
-            backgroundRepeat: "no-repeat",
-            backgroundSize: "300px 200px",
-          }}
-        ></div>
+        {/* Fixed background container */}
+        <div className="fixed inset-0 flex justify-center items-center pointer-events-none">
+          <img
+            src="/atomaLogo.svg"
+            alt="Logo"
+            className="w-[300px] h-[200px] opacity-10"
+          />
+        </div>
 
-   <Messages messages={messages}/>
+        {/* Scrollable content */}
+        <div className="relative z-10">
+          <Messages messages={messages} />
 
-        {/* Loading indicator for LLM thinking */}
-        {isThinking && (
-          <div className="relative mb-3 p-3 rounded-md w-fit max-w-[70%] bg-gray-300 text-black self-start mr-auto text-left">
-            Please wait...
-          </div>
-        )}
+          {isThinking && (
+            <div className="relative mb-3 p-3 rounded-md w-fit max-w-[70%] bg-gray-300 text-black self-start mr-auto text-left">
+              Please wait...
+            </div>
+          )}
+        </div>
       </div>
       {/* Input area */}
 
-   
       {/* Input area */}
       <div className="w-[90%] max-w-2xl">
         <div className="flex items-center mt-2">
@@ -128,9 +129,8 @@ export default function Home() {
         </div>
 
         {/* Sample Questions */}
-       <SampleQuestions handleSend={handleSend}/>
+        <SampleQuestions handleSend={handleSend} />
       </div>
-   
     </div>
   );
 }
